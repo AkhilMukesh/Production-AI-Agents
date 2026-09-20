@@ -1,133 +1,49 @@
 
 from dotenv import load_dotenv
-from importlib.metadata import version
-
-import streamlit as st
-from langchain_groq import ChatGroq
-
-
-# --------------------------------------------------
-# Load environment variables
-# --------------------------------------------------
 load_dotenv()
 
+from langchain_core import __version__ as core_version
+from importlib.metadata import version
+from langchain_groq import ChatGroq
+import streamlit as st
 
-# --------------------------------------------------
-# Get package versions
-# --------------------------------------------------
+
 core_version = version("langchain-core")
 lg_version = version("langgraph")
 
 
-# --------------------------------------------------
-# Page configuration
-# --------------------------------------------------
-st.set_page_config(
-    page_title="Production AI Agent",
-    page_icon="🤖",
-    layout="centered"
-)
+# UI
+st.title("🤖 Production AI Agents")
+
+st.write("LangChain + Groq")
+
+st.write(f"LangChain Core Version: {core_version}")
+st.write(f"LangGraph Version: {lg_version}")
 
 
-# --------------------------------------------------
-# Header
-# --------------------------------------------------
-st.title("🤖 Production AI Agent")
-st.caption("LangChain + LangGraph + Groq")
+def main():
 
+    print("Hello from langchain")
 
-# --------------------------------------------------
-# Sidebar
-# --------------------------------------------------
-with st.sidebar:
-
-    st.header("⚙️ Configuration")
-
-    st.write("**LLM Provider:** Groq")
-    st.write("**Model:** openai/gpt-oss-120b")
-
-    st.divider()
-
-
-    st.write(f"LangChain Core: `{core_version}`")
-    st.write(f"LangGraph: `{lg_version}`")
-
-
-# --------------------------------------------------
-# Create Groq LLM
-# --------------------------------------------------
-@st.cache_resource
-def get_llm():
-
-    return ChatGroq(
+    llm_groq = ChatGroq(
         model="openai/gpt-oss-120b",
         temperature=0
     )
 
+    user_input = st.text_input("Enter your question:")
 
-llm_groq = get_llm()
+    if user_input:
 
+        response_groq = llm_groq.invoke(user_input)
 
-# --------------------------------------------------
-# Chat history
-# --------------------------------------------------
-if "messages" not in st.session_state:
+        st.write("### Groq Response")
+        st.write(response_groq.content)
 
-    st.session_state.messages = []
+        print(f"Response from ChatGroq: {response_groq}")
 
-
-# --------------------------------------------------
-# Display previous messages
-# --------------------------------------------------
-for message in st.session_state.messages:
-
-    with st.chat_message(message["role"]):
-
-        st.markdown(message["content"])
+    print("Setup complete")
 
 
-# --------------------------------------------------
-# Chat input
-# --------------------------------------------------
-user_input = st.chat_input(
-    "Ask something..."
-)
+if __name__ == "__main__":
+    main()
 
-
-# --------------------------------------------------
-# Process user message
-# --------------------------------------------------
-if user_input:
-
-    # Display user message
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": user_input
-        }
-    )
-
-    with st.chat_message("user"):
-
-        st.markdown(user_input)
-
-
-    # Generate response
-    with st.chat_message("assistant"):
-
-        with st.spinner("Thinking..."):
-
-            response = llm_groq.invoke(user_input)
-
-            answer = response.content
-
-            st.markdown(answer)
-
-
-    # Save assistant response
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": answer
-        }
-    )
