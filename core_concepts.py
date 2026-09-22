@@ -90,6 +90,8 @@ def demo_schema_inspectoin():
 
     print(f"input schema: {input_schema}")
     print(f"output schema: {output_schema}")
+
+
 if __name__ == "__main__":
     #demo_basic_chain()
     #demo_batch_execution()
