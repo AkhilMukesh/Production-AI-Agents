@@ -76,7 +76,7 @@ def demo_streaming():
 def demo_schema_inspectoin():
     """Demonstarte input/output schema inspection"""
     prompt = ChatPromptTemplate.from_template("write a haiku : {text}")
-    model = model = ChatGroq(
+    model = ChatGroq(
                 model = "openai/gpt-oss-120b",
                 temperature=0.6
                 )
